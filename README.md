@@ -8,6 +8,7 @@ Currently implemented:
 - Math
 	- Sieve of Eratosthenes
 	- Primes sqrt(n) expanding
+	- Fast Euler function calculation
 
 - Graph
 	- Base undirected graph template

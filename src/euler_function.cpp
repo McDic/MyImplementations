@@ -1,6 +1,6 @@
 /*
 	Author: McDic
-	Description: Calculation of Euler function.
+	Description: Fast calculation of Euler function.
 */
 
 #include <stdio.h>
