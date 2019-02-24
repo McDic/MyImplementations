@@ -1,6 +1,7 @@
 # MyImplementations
 
 This git repository is used to store my own implementations.
+All source codes are available on `/src` folder.
 
 Currently implemented:
 
@@ -14,4 +15,4 @@ Currently implemented:
 	- Matrix multiplication and power
 	
 - Segment Tree
-	- Lazy propagation on static tree
+	- Lazy propagation on static segment tree
