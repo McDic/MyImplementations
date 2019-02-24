@@ -41,7 +41,6 @@ int main(void){
 	while(!pq.empty()){
 		pli now_info = pq.top(); pq.pop();
 		int now = now_info.second;
-		if(dist[now] > now_info.first) continue;
 		for(auto next_info: edges[now]){
 			int next = next_info.first, singledist = next_info.second;
 			if(dist[next] > dist[now] + singledist){
