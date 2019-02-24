@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <vector>
 #include <queue>
+#include <algorithm>
 
 // Attributes
 int v, e;
@@ -47,6 +48,10 @@ int main(void){
 		edges[v2].push_back(v1);
 	}
 	
+	// Clean sort
+	for(int i=0; i<edges.size(); i++) std::sort(edges[i].begin(), edges[i].end());
+	
+	// Traversal and checked
 	std::vector<int> traversal;
 	std::vector<bool> checked;
 	
