@@ -33,7 +33,7 @@ public:
 	}
 	
 	// Multiplication
-	squarematrix operator *(const squarematrix another){
+	squarematrix operator *(const squarematrix &another){
 		assert(this->mat.size() == another.mat.size());
 		int size = this->mat.size();
 		squarematrix result = squarematrix(size, false);
