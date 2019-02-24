@@ -28,7 +28,7 @@ lld euler(lld x){
 			prime_divisors.push_back(x);
 			break;
 		}
-		else if(x >= limit && p*p > x){ // Cannot find divisors -> prime
+		else if(x >= limit && (lld)p*p > x){ // Cannot find divisors -> prime
 			prime_divisors.push_back(x);
 			break;
 		}
@@ -44,7 +44,7 @@ lld euler(lld x){
 		int included = 0;
 		lld mul = 1;
 		for(int digit=0; digit<prime_divisors.size(); digit++){
-			if(it&(1<<digit)){
+			if(it&(1LL<<digit)){
 				included++;
 				mul *= prime_divisors[digit];
 			}
