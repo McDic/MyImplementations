@@ -12,8 +12,7 @@ int v, e;
 std::vector<std::vector<int>> edges;
 
 // DFS with recursive function
-void dfs(int index, std::vector<int> &traversal, 
-		 std::vector<bool> &checked){
+void dfs(int index, std::vector<int> &traversal, std::vector<bool> &checked){
 	if(checked[index]) return;
 	checked[index] = true;
 	traversal.push_back(index);
@@ -22,8 +21,7 @@ void dfs(int index, std::vector<int> &traversal,
 }
 
 // BFS with queue
-void bfs(int index, std::vector<int> &traversal, 
-		 std::vector<bool> &checked){
+void bfs(int index, std::vector<int> &traversal, std::vector<bool> &checked){
 	std::queue<int> q;
 	q.push(index);
 	while(!q.empty()){
