@@ -8,6 +8,7 @@
 #include <vector>
 
 // Attributes
+typedef long long int lld;
 std::vector<bool> isPrime;
 std::vector<int> primes;
 
@@ -15,7 +16,7 @@ int main(void){
 	
 	// Get input
 	printf("Input upper bound to calculate all primes: ");
-	int n = 20000000; scanf("%d", &n);
+	int n = 20000000; //scanf("%d", &n);
 	assert(2<=n);
 	
 	// Sieve of Eratosthenes
@@ -23,9 +24,10 @@ int main(void){
 	isPrime = std::vector<bool>(n+1, true);
 	isPrime[0] = false; isPrime[1] = false;
 	for(int i=2; i<=n; i++){
-		if(isPrime[i]){
-			for(int j=2*i; j<=n; j+=i) isPrime[j] = false;
-			primes.push_back(i);
+		if(isPrime[i]) primes.push_back(i);
+		for(int j=0; j<primes.size() && (lld)i*primes[j] <= (lld)n; j++){
+			isPrime[i*primes[j]] = false;
+			if(i % primes[j] == 0) break;
 		}
 	}
 	
