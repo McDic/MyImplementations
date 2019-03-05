@@ -1,81 +1,131 @@
-/*
-	Author: McDic
-	Description: Convex hull implementation using Graham scan.
-*/
-
 #include <stdio.h>
 #include <cmath>
 #include <vector>
 #include <algorithm>
 #include <utility>
 
-typedef std::pair<int, int> pii;
 typedef long long int lld;
+const double dbinf = 1e100;
+double minangle = 1e100;
 
-// Calculate angle
-double angle(const pii point){
-	if(point.first == 0){
-		if(point.second > 0) return M_PI / 2.0;
-		else if(point.second < 0) return M_PI / -2.0;
-		else return -1e100;
+template <class T> struct ConvexHull{
+
+	// Typedef and constants
+	typedef std::pair<T,T> point;
+
+	// Calculate angle
+	static double angle(const point &p){
+		if(p.first == 0){
+			if(p.second > 0) return M_PI / 2.0;
+			else if(p.second < 0) return -M_PI / 2.0;
+			else return -dbinf;
+		} else return atan2(p.second, p.first);
 	}
-	else return atan2(point.second, point.first);
-}
-
-// Compare vertices in monotonic angle
-bool compare_angle(const pii &p1, const pii &p2){return angle(p1) < angle(p2);}
-
-// Calculate z coordinate of (p0p1) X (p1p2)
-lld z_by_cross(pii p0, pii p1, pii p2){
-	lld ax = (lld)(p1.first) - p0.first, ay = (lld)(p1.second) - p0.second,
-	    bx = (lld)(p2.first) - p1.first, by = (lld)(p2.second) - p1.second;
-	return ax*by - ay*bx;
-}
+	
+	// Square of abs
+	static T absq(const point &p){return p.first * p.first + p.second * p.second;}
+	
+	// Compare vertices in monotonic angle.
+	static bool compare_angle(const point &p1, const point &p2){
+		double a1 = angle(p1), a2 = angle(p2);
+		if(a1 == a2){
+			if(a1 == minangle) return absq(p1) < absq(p2); // If minimum angle, then should check close point first
+			else return absq(p1) > absq(p2); // Otherwise should check far point first
+		} else return a1 < a2;
+	}
+	
+	// Compute Z of cross dot
+	static T z_by_cross(const point &p0, const point &p1, const point &p2){
+		T ax = p1.first - p0.first, ay = p1.second - p0.second;
+		T bx = p2.first - p1.first, by = p2.second - p1.second;
+		return ax*by - ay*bx;
+	}
+	
+	// Calculate Convex Hull based on Graham's scan. Remove parallel vertices if strict.
+	static std::vector<point> calculate(std::vector<point> points, bool strict = false, bool debug_msg = false){
+		
+		// Base sort
+		std::sort(points.begin(), points.end());
+		point baseoffset = points[0];
+		minangle = dbinf;
+		for(auto &p: points){
+			p.first -= baseoffset.first, p.second -= baseoffset.second;
+			double thisangle = angle(p);
+			if(minangle > thisangle && thisangle != -dbinf) minangle = thisangle;
+		}
+		std::sort(points.begin(), points.end(), compare_angle);
+		if(debug_msg){
+			printf("Minimum angle = %g, baseoffset = (%g, %g)\n", 
+			       minangle, (double)baseoffset.first, (double)baseoffset.second);
+			printf("Sorted order:\n");
+			for(auto p: points) 
+				printf("  (%g, %g) angle %g, absq %g\n", 
+				       (double)(p.first + baseoffset.first), (double)(p.second + baseoffset.second), 
+					   angle(p), (double)absq(p));
+		}
+		for(auto &p: points) p.first += baseoffset.first, p.second += baseoffset.second;
+		
+		// Calculate
+		std::vector<point> convex;
+		for(auto p_now: points){
+			if(debug_msg) printf("Looking for (%g, %g):\n", (double)(p_now.first), (double)(p_now.second));
+			while(true){
+				
+				// If convex size is less than 2 then just push
+				if(convex.size() < 2){
+					if(debug_msg) printf("\tPushing (%g, %g) because not enough convex size\n", 
+						(double)(p_now.first), (double)(p_now.second));
+					convex.push_back(p_now);
+					break;
+				}
+				
+				// Calculate z axis from (p_p - p_pp) and (p_n - p_p) to determine if (p_pp, p_p, p_n) is counter clockwise or not
+				point p_prev = convex[convex.size()-1], p_prevprev = convex[convex.size()-2];
+				T z = z_by_cross(p_prevprev, p_prev, p_now);
+				if((strict && z>0) || (!strict && z>=0)){ // Push if met good condition
+					if(debug_msg) printf("\tPushing (%g, %g) because z = %g >%c 0\n", 
+						(double)(p_now.first), (double)(p_now.second), (double)z, strict ? 0:'=');
+					convex.push_back(p_now);
+					break;
+				}
+				else{
+					if(debug_msg) printf("\tPopping (%g, %g) because z = %g <%c 0\n", 
+						(double)(p_prev.first), (double)(p_prev.second), (double)z, strict ? '=':0);
+					convex.pop_back();
+				}
+			}
+		} 
+		
+		// If strict, should remove last remaining parallel points
+		if(strict){
+			while(convex.size() > 3){
+				point p_next = convex[0], p_now = convex[convex.size()-1], p_prev = convex[convex.size()-2];
+				T z = z_by_cross(p_prev, p_now, p_next);
+				if(z>0) break;
+				if(debug_msg) printf("Popping (%g, %g) because last point is parallel to first point\n",
+			                         (double)(p_now.first), (double)(p_now.second));
+				convex.pop_back();
+			}
+			// Testing
+			T z = z_by_cross(convex.back(), convex[0], convex[1]);
+			if(z<=0) throw "undefined";
+		} return convex;
+	}
+};
 
 int main(void){
 	
 	// Get input and sort by monotonic angle (anti-clockwise)
-	std::vector<pii> vertices;
+	std::vector<std::pair<lld, lld>> vertices;
 	int n; scanf("%d", &n);
 	for(int i=0; i<n; i++){
-		char trash;
-		int x, y; scanf("%d %d", &x, &y);
+		lld x, y; scanf("%lld %lld", &x, &y);
 		vertices.push_back({x, y});
 	} 
-	
-	// Sort by X/Y, pick endpoint, and re-sort by angle
-	std::sort(vertices.begin(), vertices.end());
-	pii base = vertices.front();
-	for(int i=0; i<vertices.size(); i++){
-		vertices[i].first -= base.first;
-		vertices[i].second -= base.second;
-	}
-	std::sort(vertices.begin(), vertices.end(), compare_angle);
-	
-	// Create convex stack
-	std::vector<pii> convex_stack;
-	for(int i=0; i<n; i++){
-		pii now = vertices[i];
-		while(true){ // Compare now - prev - prevprev
-			if(convex_stack.size() < 2){
-				convex_stack.push_back(now);
-				break;
-			}
-			pii prev = convex_stack[convex_stack.size()-1], prevprev = convex_stack[convex_stack.size()-2];
-			lld z = z_by_cross(prevprev, prev, now);
-			if(z > 0){ // Anti-clockwise since the vertices is sorted by anti-clockwise
-				convex_stack.push_back(now);
-				break;
-			}
-			else{
-				convex_stack.pop_back();
-			}
-		}
-	}
-	
-	printf("%d vertices are in convex line\n", convex_stack.size());
-	for(int i=0; i<convex_stack.size(); i++) 
-		printf("(%d, %d)\n", convex_stack[i].first + base.first, convex_stack[i].second + base.second);
+
+	std::vector<std::pair<lld, lld>> convexhull = ConvexHull<lld>::calculate(vertices, true, false);
+	printf("Total %d vertices in Convex Hull\n", convexhull.size());
+	for(auto p: convexhull) printf("(%lld, %lld)\n", p.first, p.second);
 	
 	return 0;
 }
