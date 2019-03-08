@@ -4,12 +4,10 @@
 	             This is crazy idea. I respect Dr.K, Dr.M, and Dr.P.
 */
 
+#include <stdio.h>
 #include <iostream>
 #include <vector>
 #include <string>
-
-// Constraints
-const int limit = 500005;
 
 // Prefix == Suffix? Time complexity = O(len + sum(log(??))) ~= O(len).
 std::vector<int> presuf(const std::string &line){
@@ -37,22 +35,25 @@ std::vector<int> presuf(const std::string &line){
 std::vector<int> find(const std::string &origin, const std::string &target){
 
 	std::vector<int> results, presuf_target = presuf(target);
-	for(int i=0; i<presuf_target.size(); i++) printf("Prefix == Suffix for target[0:%d] = len %d\n", i, presuf_target[i]);
+	//for(int i=0; i<presuf_target.size(); i++) printf("Prefix == Suffix for target[0:%d] = len %d\n", i, presuf_target[i]);
 	
 	int head = 0, offset = 0;
-	printf("head = %d, offset = %d\n", head, offset);
+	//printf("head = %d, offset = %d\n", head, offset);
 	// Currently origin[head ~ head+offset-1] == target[0 ~ offset-1]
-	while(head <= origin.size() - target.size()){
+	while(head < origin.length()){
+		
+		// Break it
+		if(head+offset >= origin.length()) break;
 		
 		// If origin[head+offset] == target[offset]
 		//    offset++ to compare next element.
-		if(origin[head+offset] == target[offset]){ // Expand
-			printf("\tExpand.\n");
+		else if(origin[head+offset] == target[offset]){ // Expand
+			//printf("\tExpand.\n");
 			offset++;
 			if(offset == target.length()){ 
 				// Case found; Add current head into result and compare B vs T instead of BCB vs T 
 				//             Because we find that BCB == T.
-				printf("\tFound at index %d\n", head);
+				//printf("\tFound at index %d\n", head);
 				results.push_back(head);
 				head += offset - presuf_target[offset-1];
 				offset = presuf_target[offset-1];
@@ -61,23 +62,24 @@ std::vector<int> find(const std::string &origin, const std::string &target){
 		
 		// Else: Currently ABCBX, Change comparing BX vs T instead of BCBX vs T 
 		//                        because we found that BCBX != T.
-		else if(offset == 0) head++, printf("\tPerfect wrong, just moving head to next place\n");
+		else if(offset == 0) head++; //printf("\tPerfect wrong, just moving head to next place\n");
 		else{
-			printf("\tBCBX vs T -> BX vs T\n");
+			//printf("\tBCBX vs T -> BX vs T\n");
 			head += offset - presuf_target[offset-1];
 			offset = presuf_target[offset-1];
 		}
 		
-		printf("head = %d, offset = %d\n", head, offset);
+		//printf("head = %d, offset = %d\n", head, offset);
 	} return results;
 }
 
 int main(void){
 	
 	std::string origin, need;
-	std::cin >> origin >> need;
+	std::cout << "Please enter your origin string: "; std::getline(std::cin, origin);
+	std::cout << "Please enter your target string: "; std::getline(std::cin, need);
 	std::vector<int> found = find(origin, need);
-	//for(auto index: found) printf("Find at index %d\n", index);
-	
+	printf("Total %d occurences found.\nIndex: ", found.size());
+	for(auto index: found) printf("%d ", index); printf("\n");
 	return 0;
 }
