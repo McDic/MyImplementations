@@ -1,3 +1,8 @@
+/*
+	Author: McDic
+	Description: Convex hull using Graham's scan.
+*/
+
 #include <stdio.h>
 #include <cmath>
 #include <vector>
