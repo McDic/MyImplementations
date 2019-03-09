@@ -1,3 +1,8 @@
+/*
+	Author: McDic
+	Description: String comparing using simple hash with multiple modulos.
+*/
+
 #include <iostream>
 #include <vector>
 #include <string>
