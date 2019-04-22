@@ -73,6 +73,7 @@ public:
 		if(!this->willPropagate) return; // Tried propagation on non-planned node
 		else if(!this->isLeaf() && (this->leftchild->willPropagate || this->rightchild->willPropagate)) return; // Child will be propagated
 		else{ // Do now; This node is leaf or all child nodes are already updated
+			//printf("Propagating node [%lld, %lld]\n", left, right);
 			this->willPropagate = false;
 			this->singleUpdate();
 			if(this->parent != NULL) this->parent->upperPropagation();
@@ -80,7 +81,7 @@ public:
 	}
 	
 	// Change value for given range
-	void changeValue(lld val, int lbound, int rbound){
+	void update(lld val, int lbound, int rbound){
 		int dir = this->updateDirection(lbound, rbound);
 		if(dir == -1) return; // Error occured
 		this->willPropagate = true;
@@ -90,34 +91,33 @@ public:
 		}
 		else if(dir == 1){
 			this->leftchild->willPropagate = true;
-			this->leftchild->changeValue(val, lbound, rbound); // Left update
+			this->leftchild->update(val, lbound, rbound); // Left update
 		}
 		else if(dir == 2){
 			this->rightchild->willPropagate = true;
-			this->rightchild->changeValue(val, lbound, rbound); // Right update
+			this->rightchild->update(val, lbound, rbound); // Right update
 		}
 		else if(dir == 3){ // Both update
 			this->leftchild->willPropagate = true;
 			this->rightchild->willPropagate = true;
-			this->leftchild->changeValue(val, lbound, this->leftchild->right);
-			this->rightchild->changeValue(val, this->rightchild->left, rbound);
+			this->leftchild->update(val, lbound, this->leftchild->right);
+			this->rightchild->update(val, this->rightchild->left, rbound);
 		}
 	}
 	
 	// Find sum, min, max for given lbound and rbound
-	void search(int lbound, int rbound, lld *sum){
+	lld search(int lbound, int rbound){
 		int dir = this->updateDirection(lbound, rbound);
 		if(dir == -1) throw "Invalid range"; // Error occured
 		else if(dir == 0){ // Direct found
 			//printf("Found fit (%lld, %lld): sum %lld\n", lbound, rbound, this->sum);
-			*sum += this->sum;
-			*sum %= R;
+			return this->sum;
 		}
-		else if(dir == 1) this->leftchild->search(lbound, rbound, sum); // Left search
-		else if(dir == 2) this->rightchild->search(lbound, rbound, sum); // Right search
+		else if(dir == 1) return this->leftchild->search(lbound, rbound); // Left search
+		else if(dir == 2) return this->rightchild->search(lbound, rbound); // Right search
 		else if(dir == 3){ // Both search
-			this->leftchild->search(lbound, this->leftchild->right, sum);
-			this->rightchild->search(this->rightchild->left, rbound, sum);
+			return (this->leftchild->search(lbound, this->leftchild->right)
+					+ this->rightchild->search(this->rightchild->left, rbound)) % R;
 		}
 	}
 	
@@ -148,7 +148,7 @@ int main(void){
 	
 	// Initialize segment tree
 	node *root = new node(1, n, NULL);
-	for(int i=0; i<n; i++) root->changeValue(nums[i], i+1, i+1);
+	for(int i=0; i<n; i++) root->update(nums[i], i+1, i+1);
 	printf("Tree initialized.\n\n");
 	root->print(0);
 	
@@ -156,7 +156,7 @@ int main(void){
 	while(true){
 		printBar();
 		printf("Query type '0' -> Terminate program\n");
-		printf("Query type '1 L R X' -> Change value by X with range [L, R]\n");
+		printf("Query type '1 L R X' -> Add value by X with range [L, R]\n");
 		printf("Query type '2 L R' -> Find values with range [L, R]\n");
 		printf("Please input your query: ");
 		int command; scanf("%d", &command);
@@ -170,7 +170,7 @@ int main(void){
 			if(L > R || 1 > L || n < R) printf("Invalid range detected. Please try again.\n");
 			else{
 				printf("Value changed to %lld in range [%d, %d].\n\n", x, L, R);
-				root->changeValue(x, L, R);
+				root->update(x, L, R);
 				root->print(0);
 			}
 		}
@@ -178,7 +178,7 @@ int main(void){
 			int L, R; scanf("%d %d", &L, &R);
 			if(L > R || 1 > L || n < R) printf("Invalid range detected. Please try again.\n");
 			else{
-				lld sum = 0; root->search(L, R, &sum);
+				lld sum = root->search(L, R);
 				printf("Search result in range [%d, %d]: Sum = %lld\n", L, R, sum);	
 			}
 		}
