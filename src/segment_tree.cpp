@@ -88,9 +88,17 @@ public:
 			this->num = val; // Direct update
 			this->upperPropagation(); // Upper propagation
 		}
-		else if(dir == 1) this->leftchild->changeValue(val, lbound, rbound); // Left update
-		else if(dir == 2) this->rightchild->changeValue(val, lbound, rbound); // Right update
+		else if(dir == 1){
+			this->leftchild->willPropagate = true;
+			this->leftchild->changeValue(val, lbound, rbound); // Left update
+		}
+		else if(dir == 2){
+			this->rightchild->willPropagate = true;
+			this->rightchild->changeValue(val, lbound, rbound); // Right update
+		}
 		else if(dir == 3){ // Both update
+			this->leftchild->willPropagate = true;
+			this->rightchild->willPropagate = true;
 			this->leftchild->changeValue(val, lbound, this->leftchild->right);
 			this->rightchild->changeValue(val, this->rightchild->left, rbound);
 		}
@@ -99,16 +107,17 @@ public:
 	// Find sum, min, max for given lbound and rbound
 	void search(int lbound, int rbound, lld *sum){
 		int dir = this->updateDirection(lbound, rbound);
-		if(dir == -1) return; // Error occured
+		if(dir == -1) throw "Invalid range"; // Error occured
 		else if(dir == 0){ // Direct found
+			//printf("Found fit (%lld, %lld): sum %lld\n", lbound, rbound, this->sum);
 			*sum += this->sum;
 			*sum %= R;
 		}
 		else if(dir == 1) this->leftchild->search(lbound, rbound, sum); // Left search
 		else if(dir == 2) this->rightchild->search(lbound, rbound, sum); // Right search
 		else if(dir == 3){ // Both search
-			this->leftchild->search(lbound, rbound, sum);
-			this->rightchild->search(lbound, rbound, sum);
+			this->leftchild->search(lbound, this->leftchild->right, sum);
+			this->rightchild->search(this->rightchild->left, rbound, sum);
 		}
 	}
 	
@@ -158,7 +167,7 @@ int main(void){
 		}
 		else if(command == 1){ // Change value
 			int L, R; lld x; scanf("%d %d %lld", &L, &R, &x);
-			if(L > R || 1 > L || n <= R) printf("Invalid range detected. Please try again.\n");
+			if(L > R || 1 > L || n < R) printf("Invalid range detected. Please try again.\n");
 			else{
 				printf("Value changed to %lld in range [%d, %d].\n\n", x, L, R);
 				root->changeValue(x, L, R);
@@ -167,9 +176,9 @@ int main(void){
 		}
 		else if(command == 2){ // Search with range
 			int L, R; scanf("%d %d", &L, &R);
-			if(L > R || 1 > L || n <= R) printf("Invalid range detected. Please try again.\n");
+			if(L > R || 1 > L || n < R) printf("Invalid range detected. Please try again.\n");
 			else{
-				lld sum; root->search(L, R, &sum);
+				lld sum = 0; root->search(L, R, &sum);
 				printf("Search result in range [%d, %d]: Sum = %lld\n", L, R, sum);	
 			}
 		}
