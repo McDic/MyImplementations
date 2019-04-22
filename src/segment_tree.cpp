@@ -16,13 +16,26 @@ void printBar(const int limit = 119){
 	printf("\n");
 }
 
+#include <stdio.h>
+#include <vector>
+
+// Constants
+typedef long long int lld;
+lld R = 1000 * 1000 * 1000 + 7;
+
+// Pretty bar
+void printBar(const int limit = 119){
+	for(int i=0; i<limit; i++) printf("-");
+	printf("\n");
+}
+
 // Represents single node.
 class node{
 public:
 
 	// Node attributes
 	int left, right; // Covering
-	lld num, sum, mul; // Node's covering number and integrated features under this node
+	lld num, sum; // Node's covering number and integrated features under this node
 	bool willPropagate; // Lazy upper propagation
 	node *leftchild, *rightchild, *parent; // Parent and child nodes
 	
@@ -64,8 +77,8 @@ public:
 	
 	// Single update
 	void singleUpdate(){
-		this->sum = this->num, this->mul = this->num;
-		if(!this->isLeaf())	this->sum = (this->num + this->leftchild->sum + this->rightchild->sum) % R;
+		this->sum = this->num * (this->right - this->left + 1);
+		if(!this->isLeaf())	this->sum += this->leftchild->sum + this->rightchild->sum;
 	}
 	
 	// Lazy upper propagation
@@ -86,7 +99,7 @@ public:
 		if(dir == -1) return; // Error occured
 		this->willPropagate = true;
 		if(dir == 0) {
-			this->num = val; // Direct update
+			this->num += val; // Direct update
 			this->upperPropagation(); // Upper propagation
 		}
 		else if(dir == 1){
@@ -108,16 +121,17 @@ public:
 	// Find sum, min, max for given lbound and rbound
 	lld search(int lbound, int rbound){
 		int dir = this->updateDirection(lbound, rbound);
+		lld thissum = this->sum, thisnum = this->num * (rbound - lbound + 1);
 		if(dir == -1) throw "Invalid range"; // Error occured
 		else if(dir == 0){ // Direct found
 			//printf("Found fit (%lld, %lld): sum %lld\n", lbound, rbound, this->sum);
-			return this->sum;
+			return thissum;
 		}
-		else if(dir == 1) return this->leftchild->search(lbound, rbound); // Left search
-		else if(dir == 2) return this->rightchild->search(lbound, rbound); // Right search
+		else if(dir == 1) return this->leftchild->search(lbound, rbound) + thisnum; // Left search
+		else if(dir == 2) return this->rightchild->search(lbound, rbound) + thisnum; // Right search
 		else if(dir == 3){ // Both search
 			return (this->leftchild->search(lbound, this->leftchild->right)
-					+ this->rightchild->search(this->rightchild->left, rbound)) % R;
+					+ this->rightchild->search(this->rightchild->left, rbound) + thisnum) ;
 		}
 	}
 	
@@ -169,7 +183,7 @@ int main(void){
 			int L, R; lld x; scanf("%d %d %lld", &L, &R, &x);
 			if(L > R || 1 > L || n < R) printf("Invalid range detected. Please try again.\n");
 			else{
-				printf("Value changed to %lld in range [%d, %d].\n\n", x, L, R);
+				printf("Value added to %lld in range [%d, %d].\n\n", x, L, R);
 				root->update(x, L, R);
 				root->print(0);
 			}
