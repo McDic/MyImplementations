@@ -84,14 +84,16 @@ public:
 		int dir = this->updateDirection(lbound, rbound);
 		if(dir == -1) return; // Error occured
 		this->willPropagate = true;
-		if(dir == 0) this->num = val; // Direct update
+		if(dir == 0) {
+			this->num = val; // Direct update
+			this->upperPropagation(); // Upper propagation
+		}
 		else if(dir == 1) this->leftchild->changeValue(val, lbound, rbound); // Left update
 		else if(dir == 2) this->rightchild->changeValue(val, lbound, rbound); // Right update
 		else if(dir == 3){ // Both update
 			this->leftchild->changeValue(val, lbound, this->leftchild->right);
 			this->rightchild->changeValue(val, this->rightchild->left, rbound);
 		}
-		this->upperPropagation(); // Upper propagation
 	}
 	
 	// Find sum, min, max for given lbound and rbound
