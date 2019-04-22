@@ -8,14 +8,16 @@
 #include <vector>
 #include <string>
 
-// Big integer implementation. Zero is considered as positive number.
+// Big integer class
 class bigInt{
 private:
 	
 	// ----------------------------------------------------------------------------------
 	// Attributes
-	bool sign;
+	
+	bool sign; // + or -. Zero is considered as positive.
 	std::vector<int> digits; // Each digit stores 10^4.
+	const static int onesize = 10000;
 	
 	// ----------------------------------------------------------------------------------
 	// Helper functions
@@ -32,29 +34,19 @@ public:
 	// Constructors
 	
 	// Constructor by int
-	bigInt(int x = 0){
+	bigInt(int x = 0){*this = bigInt((long long int)x);}
+	bigInt(long long int x){
 		if(x>=0) sign = true;
 		else x *= -1, sign = false;
 		digits.clear();
 		while(x>0){
-			digits.push_back(x%1000);
-			x /= 1000;
-		} cleanBack();
-	}
-	bigInt(long long int x = 0){
-		if(x>=0) sign = true;
-		else x *= -1, sign = false;
-		digits.clear();
-		while(x>0){
-			digits.push_back(x%1000);
-			x /= 1000;
+			digits.push_back(x % onesize);
+			x /= onesize;
 		} cleanBack();
 	}
 	
 	// Constructor by string
-	bigInt(const char* &line){
-		*this = bigInt(std::string(line));
-	}
+	bigInt(const char* &line){*this = bigInt(std::string(line));}
 	bigInt(std::string line){
 		if(line[0] == '+' || ('0' <= line[0] && line[0] <= '9')) sign = true;
 		else sign = false;
@@ -84,21 +76,21 @@ public:
 		if(digits.empty()) return "0";
 		std::string result = std::to_string(digits.back());
 		for(int i=(int)digits.size()-2; i >= 0; i--){
-			for(int j=1000; j>0; j/=10) result += (digits[i] / j % 10) + '0';
+			for(int j = onesize/10; j>0; j/=10) result += (digits[i] / j % 10) + '0';
 		} return (sign ? '+':'-') + result;
 	}
 	
 	// ----------------------------------------------------------------------------------
 	// Comparing operators: It can be optimized even more, but for convenience of study I don't implemented it.
 	
-	bool operator == (const bigInt &another){
+	bool operator == (const bigInt &another){ // this == another ?
 		if(digits.empty() && another.digits.empty()) return true;
 		else if(sign != another.sign || digits.size() != another.digits.size()) return false;
 		for(int i=0; i<digits.size(); i++) if(digits[i] != another.digits[i]) return false;
 		return true;
 	}
 	bool operator != (const bigInt &another){return !(this->operator ==(another));}
-	bool operator > (const bigInt &another){
+	bool operator > (const bigInt &another){ // this > another ?
 		if(sign != another.sign) return sign; // this < 0 <= another (sign = false) || another < 0 <= this (sign = true)
 		else if(digits.size() > another.digits.size()) return sign; // abs(this) > abs(another)
 		else if(digits.size() < another.digits.size()) return !sign; // abs(this) < abs(another)
@@ -111,7 +103,31 @@ public:
 	bool operator < (const bigInt &another){return !(this->operator >=(another));}
 	bool operator <= (const bigInt &another){return !(this->operator >(another));}
 	
+	// ----------------------------------------------------------------------------------
+	// Arithmetic operator
 	
+	bigInt operator -() const { // return -x
+		bigInt result(*this); result.sign = !(result.sign);
+		return result;
+	}
+	bigInt operator +() const {return *this;} // return +a (= a)
+	
+	bigInt operator +(const bigInt &another){ // return this + another
+		if(sign != another.sign) return this->operator -(-another);
+		bigInt result(0);
+		int maxdigitsize = (digits.size() > another.digits.size() ? digits.size() : another.digits.size());
+		result.digits = std::vector<int>(0, maxdigitsize + 1);
+		for(int i=0; i < maxdigitsize; i++){
+			if(i < digits.size()) result.digits[i] += digits[i];
+			if(i < another.digits.size()) result.digits[i] += another.digits[i];
+			result[i+1] += result[i] / onesize;
+			result[i] %= onesize;
+		} result.cleanBack();
+		return result;
+	}
+	bigInt operator -(const bigInt &another){ // return this - another
+		if(sign != another.sign) return this->operator +(-another);
+	}
 };
 
 int main(void){
