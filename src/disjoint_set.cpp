@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <vector>
 
-class disjointset{
+class DisjointSet{
 public:
 	
 	// Attributes
 	std::vector<int> parent, rank; // Parent[i] = Parent of i in group, Rank[i] = Rank of i
 	
 	// Constructor
-	disjointset(int vertices){
+	DisjointSet(int vertices){
 		parent = std::vector<int>(vertices+1, 0);
 		rank = std::vector<int>(vertices+1, 1);
 		for(int i=0; i<parent.size(); i++) parent[i] = i;
@@ -19,6 +19,11 @@ public:
 		if(v == parent[v]) return v;
 		parent[v] = root(parent[v]);
 		return parent[v];
+	}
+	
+	// True if v1 and v2 are disjoint, otherwise False
+	bool isDisjoint(int v1, int v2){
+		return root(v1) != root(v2);
 	}
 	
 	// Union two sets
@@ -37,7 +42,7 @@ public:
 	}
 	
 	// Return current groups
-	std::vector<std::vector<int>> currentstatus(){
+	std::vector<std::vector<int>> currentStatus(){
 		std::vector<std::vector<int>> groups(parent.size());
 		for(int i=1; i<parent.size(); i++) groups[root(i)].push_back(i);
 		std::vector<std::vector<int>> result;
@@ -49,20 +54,13 @@ public:
 
 int main(void){
 	
-	disjointset DS = disjointset(10);
-	DS.merge(1, 2);
-	DS.merge(2, 3);
-	DS.merge(1, 6);
-	DS.merge(7, 8);
-	DS.merge(1, 8);
-	DS.merge(4, 5);
-	DS.merge(9, 10);
-	DS.merge(4, 10);
-	int counter = 0;
-	for(auto it: DS.currentstatus()){
-		printf("Group #%d: ", ++counter);
-		for(auto num: it) printf("%d, ", num);
-		printf("\n");
+	int n, m; scanf("%d %d", &n, &m); n++;
+	DisjointSet sets(n+1);
+	for(int i=0; i<m; i++){
+		int command, v1, v2; scanf("%d %d %d", &command, &v1, &v2); 
+		v1++, v2++;
+		if(command == 0) sets.merge(v1, v2);
+		else printf(sets.isDisjoint(v1, v2) ? "NO\n":"YES\n");
 	}
 	
 	return 0;
