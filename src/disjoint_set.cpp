@@ -1,3 +1,8 @@
+/*
+	Author: McDic
+	Description: Disjoint set data structure supports union and find.
+*/
+
 #include <stdio.h>
 #include <vector>
 
@@ -49,7 +54,6 @@ public:
 		for(std::vector<int> &it: groups) if(!it.empty()) result.push_back(it);
 		return result;
 	}
-	
 };
 
 int main(void){
