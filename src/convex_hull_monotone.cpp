@@ -72,6 +72,10 @@ template <typename coord> std::vector<Point2D<coord>> ConvexHull(
 				break;
 			}
 			else{ // Pop latest vertex
+				if(cw_indices.back() == vertices.size() - 1){
+					if(debug) std::cout << "You can't pop last vertex!! Popping cancelled.\n";
+					break;
+				}
 				if(debug) std::cout << "Popped " << cw_indices.back() << "-th vertex (" << clockwise.back().x << ", " << clockwise.back().y << ") by " << i << "-th vertex (" << vertices[i].x << " ," << vertices[i].y << ")\n";
 				clockwise.pop_back();
 				visited[cw_indices.back()] = false;
@@ -106,7 +110,7 @@ int main(void){
 		lld x, y; std::cin >> x >> y;
 		vertices.push_back(Point2D<lld>(x, y));
 	}
-	std::vector<Point2D<lld>> convexhull = ConvexHull<lld>(vertices, true, false);
+	std::vector<Point2D<lld>> convexhull = ConvexHull<lld>(vertices, true, true);
 	printf("%d\n", convexhull.size());
 	return 0;
 }

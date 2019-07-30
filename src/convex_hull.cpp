@@ -129,8 +129,9 @@ int main(void){
 	} 
 
 	std::vector<std::pair<lld, lld>> convexhull = ConvexHull<lld>::calculate(vertices, true, false);
-	printf("Total %d vertices in Convex Hull\n", convexhull.size());
-	for(auto p: convexhull) printf("(%lld, %lld)\n", p.first, p.second);
+	printf("%d\n", convexhull.size());
+	//printf("Total %d vertices in Convex Hull\n", convexhull.size());
+	//for(auto p: convexhull) printf("(%lld, %lld)\n", p.first, p.second);
 	
 	return 0;
 }
