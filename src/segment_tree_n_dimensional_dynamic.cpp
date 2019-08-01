@@ -1,6 +1,6 @@
 /*
 	Author: McDic
-	Description: n-dimensional dynamic segment tree with lazy propagation.
+	Description: n-dimensional dynamic segment tree with lazy propagation. Currently not working.
 */
 
 #include <stdio.h>
