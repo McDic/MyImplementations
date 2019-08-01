@@ -44,7 +44,7 @@ public:
 		this->child(nextchar)->count++;
 		if(addEnd) this->child(nextchar)->endpoint++;
 	}
-	void extend(std::string word, int index, bool addEnd = true){
+	void extend(std::string &word, int index, bool addEnd = true){
 		if(word.length() <= index) return;
 		this->extend(word[index], addEnd && word.length() == index+1);
 		this->childs[word[index] - 'a']->extend(word, index+1, addEnd);
