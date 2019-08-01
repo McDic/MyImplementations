@@ -74,20 +74,21 @@ template <typename coord> std::vector<Point2D<coord>> ConvexHull(
 			else{ // Pop latest vertex
 				if(cw_indices.back() == vertices.size() - 1){
 					if(debug) std::cout << "You can't pop last vertex!! Popping cancelled.\n";
-					break;
+					return false;
 				}
 				if(debug) std::cout << "Popped " << cw_indices.back() << "-th vertex (" << clockwise.back().x << ", " << clockwise.back().y << ") by " << i << "-th vertex (" << vertices[i].x << " ," << vertices[i].y << ")\n";
 				clockwise.pop_back();
 				visited[cw_indices.back()] = false;
 				cw_indices.pop_back();
 			}
-		}
+		} return true;
 	};
 	
 	// Go monotone
 	for(int i=0; i<vertices.size(); i++) if(!visited[i]) put(i);
 	for(int i=(int)vertices.size()-1; i>=0; i--) if(!visited[i]) put(i);
-	put(0); clockwise.pop_back(); cw_indices.pop_back(); // Make it clean
+	bool putted = put(0); 
+	if(putted) clockwise.pop_back(), cw_indices.pop_back(); // Make it clean
 	
 	// Result
 	if(debug){
@@ -110,7 +111,7 @@ int main(void){
 		lld x, y; std::cin >> x >> y;
 		vertices.push_back(Point2D<lld>(x, y));
 	}
-	std::vector<Point2D<lld>> convexhull = ConvexHull<lld>(vertices, true, true);
+	std::vector<Point2D<lld>> convexhull = ConvexHull<lld>(vertices, false, true);
 	printf("%d\n", convexhull.size());
 	return 0;
 }
