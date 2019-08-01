@@ -16,19 +16,6 @@ void printBar(const int limit = 119){
 	printf("\n");
 }
 
-#include <stdio.h>
-#include <vector>
-
-// Constants
-typedef long long int lld;
-lld R = 1000 * 1000 * 1000 + 7;
-
-// Pretty bar
-void printBar(const int limit = 119){
-	for(int i=0; i<limit; i++) printf("-");
-	printf("\n");
-}
-
 // Represents single node.
 class node{
 public:
