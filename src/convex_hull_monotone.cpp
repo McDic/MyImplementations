@@ -27,12 +27,12 @@ public:
 	Point2D operator * (coord factor){ return Point2D(x * factor, y * factor);}
 	
 	// Comparing
-	bool operator < (const Point2D &another){
+	bool operator < (const Point2D &another) const{
 		if(x != another.x) return x < another.x;
 		else return y < another.y;
 	}
-	bool operator == (const Point2D &another){ return x == another.x && y == another.y;}
-	bool operator != (const Point2D &another){ return !(this->operator ==(another));}
+	bool operator == (const Point2D &another) const{ return x == another.x && y == another.y;}
+	bool operator != (const Point2D &another) const{ return !(this->operator ==(another));}
 	
 	// CCW: Clockwise (-), Colinear 0, CounterClockwise (+)
 	coord CCW(Point2D previous, Point2D next){
