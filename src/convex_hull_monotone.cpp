@@ -34,6 +34,10 @@ public:
 	bool operator == (const Point2D &another) const{ return x == another.x && y == another.y;}
 	bool operator != (const Point2D &another) const{ return !(this->operator ==(another));}
 	
+	// Absolute value
+	coord absSquare(){ return x*x + y*y;}
+	coord distanceSquare(Point2D another){ return (this->operator -(another)).absSquare();}
+	
 	// CCW: Clockwise (-), Colinear 0, CounterClockwise (+)
 	coord CCW(Point2D previous, Point2D next){
 		Point2D first = (*this) - previous, second = next - previous;
