@@ -7,9 +7,6 @@
 #include <vector>
 #include <algorithm>
 
-// Epsilon
-const long double epsilon = 1e-6;
-
 // Point class
 template <typename coord> class Point2D{
 public:
@@ -50,8 +47,11 @@ public:
 
 // Convex Hull - Returned in clockwise order.
 template <typename coord> std::vector<Point2D<coord>> ConvexHull(
-	std::vector<Point2D<coord>> vertices, bool strict, bool debug = false){
+	std::vector<Point2D<coord>> vertices, bool strict){
 	
+	// Constant
+	const long double epsilon = 1e-6;
+
 	// Sort
 	std::sort(vertices.begin(), vertices.end());
 	
@@ -72,18 +72,13 @@ template <typename coord> std::vector<Point2D<coord>> ConvexHull(
 				else if(!strict && -epsilon < CCW && CCW < epsilon) go = true;
 			}
 			if(go){ // Include current vertex
-				if(debug) std::cout << "Pushed " << i << "-th vertex (" << vertices[i].x << ", " << vertices[i].y << ")\n";
 				clockwise.push_back(vertices[i]);
 				cw_indices.push_back(i);
 				visited[i] = true;
 				break;
 			}
 			else{ // Pop latest vertex
-				if(cw_indices.back() == vertices.size() - 1){
-					if(debug) std::cout << "You can't pop last vertex!! Popping cancelled.\n";
-					return false;
-				}
-				if(debug) std::cout << "Popped " << cw_indices.back() << "-th vertex (" << clockwise.back().x << ", " << clockwise.back().y << ") by " << i << "-th vertex (" << vertices[i].x << " ," << vertices[i].y << ")\n";
+				if(cw_indices.back() == (int)vertices.size() - 1) return false; // Can't pop latest vertex
 				clockwise.pop_back();
 				visited[cw_indices.back()] = false;
 				cw_indices.pop_back();
@@ -91,25 +86,14 @@ template <typename coord> std::vector<Point2D<coord>> ConvexHull(
 		} return true;
 	};
 	
-	// Go monotone
-	for(int i=0; i<vertices.size(); i++) if(!visited[i]) put(i);
+	// Go monotone and return
+	for(int i=0; i<(int)vertices.size(); i++) if(!visited[i]) put(i);
 	for(int i=(int)vertices.size()-1; i>=0; i--) if(!visited[i]) put(i);
-	bool putted = put(0); 
-	if(putted) clockwise.pop_back(), cw_indices.pop_back(); // Make it clean
-	
-	// Result
-	if(debug){
-		std::cout << "Convex hull result:\n";
-		for(auto point: clockwise) std::cout << "  (" << point.x << ", " << point.y << ")\n";
-	}
+	if(put(0)) clockwise.pop_back(), cw_indices.pop_back(); // Make it clean
 	return clockwise;
 }
 
 int main(void){
-	
-	//Point2D<int> a(2, 1), b(2, 0), c(1, 1);
-	//printf("CCW %d\n", b.CCW(a, c));
-	//return 0;
 	
 	typedef long long int lld;
 	int n; std::cin >> n;
@@ -118,7 +102,7 @@ int main(void){
 		lld x, y; std::cin >> x >> y;
 		vertices.push_back(Point2D<lld>(x, y));
 	}
-	std::vector<Point2D<lld>> convexhull = ConvexHull<lld>(vertices, false, true);
+	std::vector<Point2D<lld>> convexhull = ConvexHull<lld>(vertices, false);
 	printf("%d\n", convexhull.size());
 	return 0;
 }
