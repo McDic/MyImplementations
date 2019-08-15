@@ -1,2 +1,6 @@
 # Generated binary files
 *.exe
+
+# Test files
+test.cpp
+*_test.cpp
