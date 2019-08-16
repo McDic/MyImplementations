@@ -32,7 +32,7 @@ public:
 	bool operator != (const Point2D &another) const{ return !(this->operator ==(another));}
 	
 	// Absolute value
-	coord absSquare(){ return x*x + y*y;}
+	coord absSquare(){ return x*x + y*y;} // abs square
 	coord distanceSquare(Point2D another){ return (this->operator -(another)).absSquare();}
 	
 	// CCW: Clockwise (-), Colinear 0, CounterClockwise (+)
@@ -50,7 +50,7 @@ template <typename coord> std::vector<Point2D<coord>> ConvexHull(
 	std::vector<Point2D<coord>> vertices, bool strict){
 	
 	// Constant
-	const long double epsilon = 1e-6;
+	const long double epsilon = 1e-6; // Epsilon used to determine sign of CCW
 
 	// Sort
 	std::sort(vertices.begin(), vertices.end());
