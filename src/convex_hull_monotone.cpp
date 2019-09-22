@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <functional>
 
 // Point class
 template <typename coord> class Point2D{
@@ -43,7 +44,23 @@ public:
 		coord z = first.x * second.y - first.y * second.x;
 		return z;
 	}
+
+	// Return true if this is on first 180' angle based on center/axis. Otherwise false.
+    bool onFirst(Point2D center, Point2D axis){
+        coord ccw_value = center.CCW(axis, *this);
+        if(ccw_value != 0) return ccw_value < 0;
+        else return this->operator == (axis); // axis -> true, antiaxis -> false
+    }
 };
+
+// Counter-clockwise comparing: Return p1<p2 based on center, axis.
+template<typename coord> bool CCW_Compare(
+Point2D<coord> p1, Point2D<coord> p2, Point2D<coord> center, Point2D<coord> axis){
+    // Check angle range of p1 and p2
+    bool p1plane = p1.onFirst(center, axis), p2plane = p2.onFirst(center, axis);
+    if(p1plane == p2plane) return center.CCW(p1, p2) < 0; // p2 is counter-clockwise later.
+    else return p1plane;
+}
 
 // Convex Hull - Returned in clockwise order.
 template <typename coord> std::vector<Point2D<coord>> ConvexHull(
