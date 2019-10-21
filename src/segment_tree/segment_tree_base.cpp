@@ -1,6 +1,6 @@
 /*
 	Author: McDic
-	Description: Implementation of static segment tree without lazy propagation.
+	Description: Implementation of segment tree without lazy propagation.
 */
 
 #include <stdio.h>
