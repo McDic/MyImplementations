@@ -167,8 +167,8 @@ class SegTree{
 // Main
 int main(int argc, char **argv){
 #ifdef __McDic__ // Local testing I/O
-    freopen("VScode/IO/input.txt", "r", stdin);
-    freopen("VScode/IO/output.txt", "w", stdout);
+    freopen("IO/input.txt", "r", stdin);
+    freopen("IO/output.txt", "w", stdout);
 #endif
 
     int n, m, k; scanf("%d %d %d", &n, &m, &k);
@@ -193,6 +193,5 @@ int main(int argc, char **argv){
         //root->representation();
         //for(int i=0; i<100; i++) printf("="); printf("\n\n");
     }
-
     return 0;
 }
