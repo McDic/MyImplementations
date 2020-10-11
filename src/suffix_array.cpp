@@ -101,28 +101,6 @@ namespace McDicCP{
             }
         }
 
-        void _innerNaiveSort(
-                const std::string &s, std::vector<int> &SA,
-                int idxleft, int idxright, int minoffset, int maxoffset){
-            int n = (int)s.length();
-            std::vector<std::pair<std::string, int>> huh;
-            for(int i=idxleft; i<idxright; i++){
-                huh.push_back({"", SA[i]});
-                for(int offset=minoffset; offset<maxoffset; offset++) 
-                    huh.back().first += s[(offset + SA[i]) % n];
-            }
-            std::sort(huh.begin(), huh.end());
-            for(int i=idxleft; i<idxright; i++) SA[i] = huh[i - idxleft].second;
-        }
-
-        // Check if cyclic suffix from i1 and i2 are same.
-        bool isSame(const std::string &s, std::vector<int> &SA, int i1, int i2, int length){
-            int n = (int)s.length();
-            for(int offset = 0; offset < length; offset++)
-                if(s[(SA[i1] + offset) % n] != s[(SA[i2] + offset) % n]) return false;
-            return true;
-        }
-
         // Construct suffix array of given string. SA[i] = i-th suffix in sorted order
         std::vector<int> ConstructSA(std::string s){
             s += '$';
