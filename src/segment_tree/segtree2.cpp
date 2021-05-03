@@ -52,21 +52,18 @@ namespace McDicCP{
 
     template<typename S, class Monoid> class SegmentTree{ public:
 
-        int size, b;
+        int size;
         std::vector<S> arr;
         Monoid monoid;
 
         SegmentTree(int size){
             this->size = size;
             monoid = Monoid();
-            b=2;
-            while(2*size > (1<<b)) b++;
-            arr = std::vector<S>(1<<b, monoid.identity());
-            b--;
+            arr = std::vector<S>(size << 1, monoid.identity());
         }
 
         void set(int location, S value){
-            location += 1<<b;
+            location += size;
             arr[location] = value;
             while(location > 1){
                 location >>= 1;
@@ -74,25 +71,13 @@ namespace McDicCP{
             }
         }
 
-        std::vector<int> range_decomposition(int left, int right){
-            left += 1<<b, right += 1<<b;
-            std::vector<int> indices_front, indices_back;
-            for(right++; left < right; left >>= 1, right >>= 1){
-                if(left & 1) indices_front.push_back(left++);
-                if(right & 1) indices_back.push_back(--right);
-            }
-            while(!indices_back.empty()){
-                indices_front.push_back(indices_back.back());
-                indices_back.pop_back();
-            }
-            return indices_front;
-        }
-
         S get(int left, int right){
-            S result = monoid.identity();
-            for(int index: range_decomposition(left, right)) 
-                result = monoid.op(result, arr[index]);
-            return result;
+            S left_answer = monoid.identity(), right_answer = monoid.identity();
+            for(left += size, right += size+1; left < right; left >>= 1, right >>= 1){
+                if(left & 1) left_answer = monoid.op(left_answer, arr[left++]);
+                if(right & 1) right_answer = monoid.op(arr[--right], right_answer);
+            }
+            return monoid.op(left_answer, right_answer);
         }
     };
 
